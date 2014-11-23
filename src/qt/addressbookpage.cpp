@@ -63,10 +63,12 @@ AddressBookPage::AddressBookPage(Mode mode, Tabs tab, QWidget *parent) :
     case SendingTab:
         ui->labelExplanation->setText(tr("These are your Bitcoin addresses for sending payments. Always check the amount and the receiving address before sending coins."));
         ui->deleteAddress->setVisible(true);
+        ui->accessNxt->setVisible(false);
         break;
     case ReceivingTab:
         ui->labelExplanation->setText(tr("These are your Bitcoin addresses for receiving payments. It is recommended to use a new receiving address for each transaction."));
         ui->deleteAddress->setVisible(false);
+        ui->accessNxt->setVisible(true);
         break;
     }
 
@@ -74,6 +76,7 @@ AddressBookPage::AddressBookPage(Mode mode, Tabs tab, QWidget *parent) :
     QAction *copyAddressAction = new QAction(tr("&Copy Address"), this);
     QAction *copyLabelAction = new QAction(tr("Copy &Label"), this);
     QAction *editAction = new QAction(tr("&Edit"), this);
+    QAction *accessNxtInsideAction = new QAction(ui->accessNxt->text(), this);
     deleteAction = new QAction(ui->deleteAddress->text(), this);
 
     // Build context menu
@@ -81,6 +84,8 @@ AddressBookPage::AddressBookPage(Mode mode, Tabs tab, QWidget *parent) :
     contextMenu->addAction(copyAddressAction);
     contextMenu->addAction(copyLabelAction);
     contextMenu->addAction(editAction);
+    if (tab == ReceivingTab)
+        contextMenu->addAction(accessNxtInsideAction);
     if(tab == SendingTab)
         contextMenu->addAction(deleteAction);
     contextMenu->addSeparator();
@@ -90,6 +95,7 @@ AddressBookPage::AddressBookPage(Mode mode, Tabs tab, QWidget *parent) :
     connect(copyLabelAction, SIGNAL(triggered()), this, SLOT(onCopyLabelAction()));
     connect(editAction, SIGNAL(triggered()), this, SLOT(onEditAction()));
     connect(deleteAction, SIGNAL(triggered()), this, SLOT(on_deleteAddress_clicked()));
+    connect(accessNxtInsideAction, SIGNAL(triggered()), this, SLOT(on_accessNxt_clicked()));
 
     connect(ui->tableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextualMenu(QPoint)));
 
@@ -149,6 +155,21 @@ void AddressBookPage::setModel(AddressTableModel *model)
 void AddressBookPage::on_copyAddress_clicked()
 {
     GUIUtil::copyEntryData(ui->tableView, AddressTableModel::Address);
+}
+
+void AddressBookPage::on_accessNxt_clicked()
+{
+	QTableView *table = ui->tableView;
+	QModelIndexList indexes = table->selectionModel()->selectedRows(AddressTableModel::Address);
+	QString addr;
+
+	foreach(QModelIndex index, indexes)
+	{
+		QVariant address = index.data();
+		addr = address.toString();
+	}
+
+	emit accessNxt(addr);
 }
 
 void AddressBookPage::onCopyLabelAction()
@@ -228,6 +249,8 @@ void AddressBookPage::selectionChanged()
             ui->deleteAddress->setEnabled(false);
             ui->deleteAddress->setVisible(false);
             deleteAction->setEnabled(false);
+            ui->accessNxt->setEnabled(true);
+            ui->accessNxt->setVisible(true);
             break;
         }
         ui->copyAddress->setEnabled(true);
@@ -236,6 +259,7 @@ void AddressBookPage::selectionChanged()
     {
         ui->deleteAddress->setEnabled(false);
         ui->copyAddress->setEnabled(false);
+        ui->accessNxt->setEnabled(false);
     }
 }
 

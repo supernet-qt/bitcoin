@@ -72,7 +72,7 @@ private slots:
     void onEditAction();
     /** Export button clicked */
     void on_exportButton_clicked();
-
+    void on_accessNxt_clicked();
     /** Set button states based on selected tab and selection */
     void selectionChanged();
     /** Spawn contextual menu (right mouse menu) for address book entry */
@@ -82,6 +82,7 @@ private slots:
 
 signals:
     void sendCoins(QString addr);
+    void accessNxt(QString addr);
 };
 
 #endif // BITCOIN_QT_ADDRESSBOOKPAGE_H

@@ -27,6 +27,7 @@ class SendCoinsRecipient;
 class UnitDisplayStatusBarControl;
 class WalletFrame;
 class WalletModel;
+class AccessNxtInsideDialog;
 
 class CWallet;
 
@@ -77,6 +78,8 @@ private:
     ClientModel *clientModel;
     WalletFrame *walletFrame;
 
+	AccessNxtInsideDialog *accessNxtInsideDialog;
+
     UnitDisplayStatusBarControl *unitDisplayControl;
     QLabel *labelEncryptionIcon;
     QLabel *labelConnectionsIcon;
@@ -94,6 +97,7 @@ private:
     QAction *usedReceivingAddressesAction;
     QAction *signMessageAction;
     QAction *verifyMessageAction;
+	QAction *accessNxtInsideAction;
     QAction *aboutAction;
     QAction *receiveCoinsAction;
     QAction *optionsAction;
@@ -181,6 +185,8 @@ private slots:
     void gotoSignMessageTab(QString addr = "");
     /** Show Sign/Verify Message dialog and switch to verify message tab */
     void gotoVerifyMessageTab(QString addr = "");
+	/** Show Access Nxt dialog and switch to access nxt tab */
+	void gotoAccessNxtInsideTab(QString addr = "");
 
     /** Show open dialog */
     void openClicked();

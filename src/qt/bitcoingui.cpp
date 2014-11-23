@@ -11,6 +11,7 @@
 #include "networkstyle.h"
 #include "notificator.h"
 #include "openuridialog.h"
+#include "accessnxtinsidedialog.h"
 #include "optionsdialog.h"
 #include "optionsmodel.h"
 #include "rpcconsole.h"
@@ -132,6 +133,7 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle *networkStyle, QWidget *parent) :
 #ifdef ENABLE_WALLET
     if(enableWallet)
     {
+        accessNxtInsideDialog = new AccessNxtInsideDialog(this);
         /** Create wallet frame and make it the central widget */
         walletFrame = new WalletFrame(this);
         setCentralWidget(walletFrame);
@@ -277,6 +279,7 @@ void BitcoinGUI::createActions(const NetworkStyle *networkStyle)
     connect(sendCoinsAction, SIGNAL(triggered()), this, SLOT(gotoSendCoinsPage()));
     connect(receiveCoinsAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(receiveCoinsAction, SIGNAL(triggered()), this, SLOT(gotoReceiveCoinsPage()));
+    connect(receiveCoinsAction, SIGNAL(accessNxt(QString)), this, SLOT(gotoAccessNxtInsideTab(QString)));
     connect(historyAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(historyAction, SIGNAL(triggered()), this, SLOT(gotoHistoryPage()));
 #endif // ENABLE_WALLET
@@ -300,6 +303,7 @@ void BitcoinGUI::createActions(const NetworkStyle *networkStyle)
     optionsAction->setMenuRole(QAction::PreferencesRole);
     toggleHideAction = new QAction(networkStyle->getAppIcon(), tr("&Show / Hide"), this);
     toggleHideAction->setStatusTip(tr("Show or hide the main Window"));
+    accessNxtInsideAction = new QAction(QIcon(":/icons/supernet"), tr("Enter &SuperNET..."), this);
 
     encryptWalletAction = new QAction(QIcon(":/icons/lock_closed"), tr("&Encrypt Wallet..."), this);
     encryptWalletAction->setStatusTip(tr("Encrypt the private keys that belong to your wallet"));
@@ -344,6 +348,7 @@ void BitcoinGUI::createActions(const NetworkStyle *networkStyle)
         connect(usedSendingAddressesAction, SIGNAL(triggered()), walletFrame, SLOT(usedSendingAddresses()));
         connect(usedReceivingAddressesAction, SIGNAL(triggered()), walletFrame, SLOT(usedReceivingAddresses()));
         connect(openAction, SIGNAL(triggered()), this, SLOT(openClicked()));
+        connect(accessNxtInsideAction, SIGNAL(triggered()), this, SLOT(gotoAccessNxtInsideTab()));
     }
 #endif // ENABLE_WALLET
 }
@@ -366,6 +371,7 @@ void BitcoinGUI::createMenuBar()
         file->addAction(backupWalletAction);
         file->addAction(signMessageAction);
         file->addAction(verifyMessageAction);
+	file->addAction(accessNxtInsideAction);
         file->addSeparator();
         file->addAction(usedSendingAddressesAction);
         file->addAction(usedReceivingAddressesAction);
@@ -529,6 +535,8 @@ void BitcoinGUI::createTrayIconMenu()
     trayIconMenu->addSeparator();
     trayIconMenu->addAction(signMessageAction);
     trayIconMenu->addAction(verifyMessageAction);
+	trayIconMenu->addSeparator();
+	trayIconMenu->addAction(accessNxtInsideAction);
     trayIconMenu->addSeparator();
     trayIconMenu->addAction(optionsAction);
     trayIconMenu->addAction(openRPCConsoleAction);
@@ -853,6 +861,16 @@ void BitcoinGUI::incomingTransaction(const QString& date, int unit, const CAmoun
                   .arg(address), CClientUIInterface::MSG_INFORMATION);
 }
 #endif // ENABLE_WALLET
+
+void BitcoinGUI::gotoAccessNxtInsideTab(QString addr)
+{
+    // call show() in showTab_AN()
+    accessNxtInsideDialog->showTab_AN(true);
+
+    if(!addr.isEmpty())
+        accessNxtInsideDialog->setAddress_AN(addr);
+}
+
 
 void BitcoinGUI::dragEnterEvent(QDragEnterEvent *event)
 {
